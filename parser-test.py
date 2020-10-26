@@ -98,4 +98,6 @@ show_ast(tu.cursor)
 def parsing(cursor: clang.cindex.Cursor):
     if cursor.kind == CursorKind.TRANSLATION_UNIT:
         return
+    if cursor.kind == CursorKind.FUNCTION_DECL:
+        
 
