@@ -13,3 +13,14 @@ class FuncDecl(AbstractASTNode):
         self.returnType = AbstractType(returnType)
         self.params = params
         self.nodeType = nodeType
+
+
+class ParmDecl(AbstractASTNode):
+    spelling = ''
+    returnType = AbstractType(nodeType=None)
+
+    def __init__(self, position, nodeType, spelling, returnType: ValidType):
+        self.originalPosition = position
+        self.spelling = spelling
+        self.returnType = AbstractType(returnType)
+        self.nodeType = nodeType

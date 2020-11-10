@@ -41,6 +41,7 @@ def _type_kind_to_validType(tk):
     debug('Type not valid, received {}'.format(baseType))
     return ValidType(5)
 
+
 class AbstractType(AbstractASTNode):
     internalType = ValidType.INVALID
 
