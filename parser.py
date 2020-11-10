@@ -12,7 +12,7 @@ from parser_set import *
 
 def parse(cursor: Cursor):
     if cursor.kind == CursorKind.PARM_DECL:
-        parse_param_decl(cursor)
+        parse_parm_decl(cursor)
     elif cursor.kind == CursorKind.FUNCTION_DECL:
         parse_function_decl(cursor)
 

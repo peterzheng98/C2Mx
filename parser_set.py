@@ -9,7 +9,7 @@ from ASTNode import *
 from ASTNode.AbstractType import _type_kind_to_validType
 
 
-def parse_param_decl(cursor: Cursor):
+def parse_parm_decl(cursor: Cursor):
     assert cursor.kind == Cursor.PARM_DECL, "Node type is {}, not PARM_DECL".format(cursor.kind)
     parmDeclNode = ParmDecl(
         (cursor.extent.start.offset, cursor.extent.end.offset),
