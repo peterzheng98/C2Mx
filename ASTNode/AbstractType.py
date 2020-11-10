@@ -1,6 +1,10 @@
 from .AbstractASTNode import AbstractASTNode
 from enum import Enum
 from utils import *
+import sys
+import clang.cindex
+
+from clang.cindex import CursorKind, TypeKind
 
 
 class ValidType(Enum):
@@ -23,6 +27,19 @@ def _base_to_validType(baseType: str):
     debug('Type not valid, received {}'.format(baseType))
     return ValidType(5)
 
+
+def _type_kind_to_validType(tk):
+    if tk == TypeKind.INT:
+        return ValidType(1)
+    if tk == TypeKind.BOOL:
+        return ValidType(2)
+    if tk == TypeKind.VOID:
+        return ValidType(3)
+    # if tk == 'string':
+    #     return ValidType(4)
+    # No string currently found
+    debug('Type not valid, received {}'.format(baseType))
+    return ValidType(5)
 
 class AbstractType(AbstractASTNode):
     internalType = ValidType.INVALID
