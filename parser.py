@@ -11,7 +11,7 @@ else:
     Config.set_library_file('/Library/Developer/CommandLineTools/usr/lib/libclang.dylib')
 
 from clang.cindex import Cursor
-from clang.cindex import CursorKind
+from clang.cindex import CursorKind, TypeKind
 
 from clang.cindex import Cursor
 from ASTNode import *
