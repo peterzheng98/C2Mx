@@ -28,7 +28,9 @@ def _base_to_validType(baseType: str):
     return ValidType(5)
 
 
-def _type_kind_to_validType(tk):
+def _type_kind_to_validType(tk, spelling=''):
+    if tk == TypeKind.FUNCTIONPROTO:
+        return _base_to_validType(spelling.split('(')[0].strip())
     if tk == TypeKind.INT:
         return ValidType(1)
     if tk == TypeKind.BOOL:
@@ -38,7 +40,7 @@ def _type_kind_to_validType(tk):
     # if tk == 'string':
     #     return ValidType(4)
     # No string currently found
-    debug('Type not valid, received {}'.format(baseType))
+    debug('Type not valid, received {}'.format(tk))
     return ValidType(5)
 
 
@@ -53,3 +55,6 @@ class AbstractType(AbstractASTNode):
         if issubclass(other, self.__class__):
             return other.internalType == self.internalType
         return False
+
+    def __repr__(self):
+        return self.nodeType.name

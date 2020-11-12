@@ -14,6 +14,12 @@ class FuncDecl(AbstractASTNode):
         self.params = params
         self.nodeType = nodeType
 
+    def addParm(self, parm_node):
+        self.params.append(parm_node)
+
+    def __repr__(self):
+        return 'Function: {}, return: {}'.format(self.spelling, self.returnType)
+
 
 class ParmDecl(AbstractASTNode):
     spelling = ''
