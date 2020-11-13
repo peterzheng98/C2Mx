@@ -6,6 +6,7 @@ class FuncDecl(AbstractASTNode):
     spelling = ''
     params = []
     returnType = AbstractType(nodeType=None)
+    statement = None
 
     def __init__(self, position, nodeType, spelling, returnType: ValidType, params: list):
         self.originalPosition = position
@@ -17,8 +18,21 @@ class FuncDecl(AbstractASTNode):
     def addParm(self, parm_node):
         self.params.append(parm_node)
 
+    def addStmt(self, stmt):
+        self.statement = stmt
+
     def __repr__(self):
-        return '<\nFunction: {}, return: {}\n>'.format(self.spelling, self.returnType)
+        return '<Function: {}, return: {}>'.format(self.spelling, self.returnType)
+
+    def generateMx(self):
+        st = '{} {}({});'.format(
+                self.returnType.nodeType.name.lower(), self.spelling,
+                ','.join([i.generateMx() for i in self.params])
+            )
+        if self.statement is None:
+            return st
+        st = st + self.statement.generateMx()
+        return st
 
 
 class ParmDecl(AbstractASTNode):
@@ -30,3 +44,6 @@ class ParmDecl(AbstractASTNode):
         self.spelling = spelling
         self.returnType = AbstractType(returnType)
         self.nodeType = nodeType
+
+    def generateMx(self):
+        return '{} {}'.format(self.returnType.nodeType.name.lower(), self.spelling)

@@ -62,4 +62,6 @@ if __name__ == '__main__':
     index = clang.cindex.Index.create()
     tu = index.parse('./ParsingSample/cf-96100658.c')
     ast = parse(tu.cursor)
+    for i in ast:
+        print(i.generateMx()) if i is not None else None
     print(ast)
