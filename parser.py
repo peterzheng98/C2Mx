@@ -20,7 +20,7 @@ from ASTNode.AbstractType import _type_kind_to_validType
 def parse_var_decl(cursor: Cursor):
     return VarDecl(
         (cursor.extent.start.offset, cursor.extent.end.offset),
-        cursor.kind, cursor.spelling, _type_kind_to_validType(cursor.type.kind, cursor.type.spelling)
+        cursor.kind, cursor.spelling, _type_kind_to_validType(cursor.type.kind, cursor.type)
     )
 
 

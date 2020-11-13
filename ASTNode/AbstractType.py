@@ -14,6 +14,9 @@ class ValidType(Enum):
     STRING = 4
     INVALID = 5
 
+    def __repr__(self):
+        return self.name.lower()
+
 
 def _base_to_validType(baseType: str):
     if baseType == 'int':
@@ -31,7 +34,8 @@ def _base_to_validType(baseType: str):
 def _type_kind_to_validType(tk, spelling=''):
     if tk == TypeKind.FUNCTIONPROTO or tk == TypeKind.FUNCTIONNOPROTO:
         return _base_to_validType(spelling.split('(')[0].strip())
-    if tk == TypeKind.CONSTANTARRAY
+    if tk == TypeKind.CONSTANTARRAY:
+        return ArrayType(spelling)
     if tk == TypeKind.INT:
         return ValidType(1)
     if tk == TypeKind.BOOL:
@@ -48,8 +52,8 @@ def _type_kind_to_validType(tk, spelling=''):
 class AbstractType(AbstractASTNode):
     internalType = ValidType.INVALID
 
-    def __init__(self, nodeType=None, baseType=ValidType.INVALID):
-        self.internalType = baseType
+    def __init__(self, nodeType=None):
+        self.internalType = nodeType
         self.nodeType = nodeType
 
     def __eq__(self, other):
@@ -59,3 +63,22 @@ class AbstractType(AbstractASTNode):
 
     def __repr__(self):
         return self.nodeType.name
+
+
+class ArrayType(AbstractType):
+    baseType = ValidType.INVALID
+    length = []
+
+    def _dfs(self, type: clang.cindex.Type):
+        if type.kind == TypeKind.CONSTANTARRAY:
+            self._dfs(type.element_type)
+            self.length = [type.element_count] + self.length
+        else:
+            self.baseType = _base_to_validType(type.spelling)
+
+    def __init__(self, type: clang.cindex.Type):
+        self._dfs(type)
+        print(repr(self))
+
+    def __repr__(self):
+        return repr(self.baseType) + repr(self.length)
