@@ -31,6 +31,7 @@ def _base_to_validType(baseType: str):
 def _type_kind_to_validType(tk, spelling=''):
     if tk == TypeKind.FUNCTIONPROTO or tk == TypeKind.FUNCTIONNOPROTO:
         return _base_to_validType(spelling.split('(')[0].strip())
+    if tk == TypeKind.CONSTANTARRAY
     if tk == TypeKind.INT:
         return ValidType(1)
     if tk == TypeKind.BOOL:

@@ -17,12 +17,42 @@ from clang.cindex import Cursor
 from ASTNode import *
 from ASTNode.AbstractType import _type_kind_to_validType
 
+def parse_var_decl(cursor: Cursor):
+    return VarDecl(
+        (cursor.extent.start.offset, cursor.extent.end.offset),
+        cursor.kind, cursor.spelling, _type_kind_to_validType(cursor.type.kind, cursor.type.spelling)
+    )
+
 
 def parse_parm_decl(cursor: Cursor):
     assert cursor.kind == CursorKind.PARM_DECL, "Node type is {}, not PARM_DECL".format(cursor.kind)
     return ParmDecl(
         (cursor.extent.start.offset, cursor.extent.end.offset),
         cursor.kind, cursor.spelling, _type_kind_to_validType(cursor.type.kind)
+    )
+
+
+def parse_compound_stmt(cursor: Cursor):
+    assert cursor.kind == CursorKind.COMPOUND_STMT, "Node type is {}, not COMPOUND_STMT".format(cursor.kind)
+    return CompoundStmt(
+        (cursor.extent.start, cursor.extent.end),
+        cursor.kind, [parse(i) for i in cursor.get_children()]
+    )
+
+
+def parse_decl_stmt(cursor: Cursor):
+    assert cursor.kind == CursorKind.DECL_STMT, "Node type is {}, not DECL_STMT".format(cursor.kind)
+    return DeclStmt(
+        (cursor.extent.start, cursor.extent.end),
+        cursor.kind, [parse(i) for i in cursor.get_children()]
+    )
+
+
+def parse_return_stmt(cursor: Cursor):
+    assert cursor.kind == CursorKind.RETURN_STMT, "Node type is {}, not RETURN_STMT".format(cursor.kind)
+    return ReturnStmt(
+        (cursor.extent.start, cursor.extent.end),
+        cursor.kind, [parse(i) for i in cursor.get_children()]
     )
 
 
@@ -51,6 +81,14 @@ def parse(cursor: Cursor):
         return parse_parm_decl(cursor)
     elif cursor.kind == CursorKind.FUNCTION_DECL:
         return parse_function_decl(cursor)
+    elif cursor.kind == CursorKind.COMPOUND_STMT:
+        return parse_compound_stmt(cursor)
+    elif cursor.kind == CursorKind.RETURN_STMT:
+        return parse_return_stmt(cursor)
+    elif cursor.kind == CursorKind.DECL_STMT:
+        return parse_decl_stmt(cursor)
+    elif cursor.kind == CursorKind.VAR_DECL:
+        return parse_var_decl(cursor)
     return None
 
 
@@ -60,7 +98,7 @@ def parse(cursor: Cursor):
 #     Config.set_library_file('/Library/Developer/CommandLineTools/usr/lib/libclang.dylib')
 if __name__ == '__main__':
     index = clang.cindex.Index.create()
-    tu = index.parse('./ParsingSample/cf-96100658.c')
+    tu = index.parse('./ParsingSample/cf-97319761.c')
     ast = parse(tu.cursor)
     for i in ast:
         print(i.generateMx()) if i is not None else None
