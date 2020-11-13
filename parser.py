@@ -83,6 +83,7 @@ def parse_unexposed_expr(cursor: Cursor):
     assert len(children) == 1, 'Length error with more than 1 child in unexposed expression'
     return parse(children[0])
 
+
 def parse_string_literal(cursor: Cursor):
     assert cursor.kind == CursorKind.STRING_LITERAL, "Node type is {}, not STRING_LITERAL".format(cursor.kind)
     return StringLiteral(
@@ -90,12 +91,18 @@ def parse_string_literal(cursor: Cursor):
         cursor.kind, cursor.spelling
     )
 
+
 def parse_call_expr(cursor: Cursor):
     assert cursor.kind == CursorKind.CALL_EXPR, "Node type is {}, not CALL_EXPR".format(cursor.kind)
     return CallExpr(
         (cursor.extent.start.offset, cursor.extent.end.offset),
         cursor.kind, cursor.spelling, [parse(i) for i in cursor.get_arguments()]
     )
+
+
+def parse_unary_op(cursor: Cursor):
+    assert cursor.kind == CursorKind.UNARY_OPERATOR, "Node type is {}, not UNARY_OPERATOR".format(cursor.kind)
+
 
 
 def parse(cursor: Cursor):
@@ -119,6 +126,8 @@ def parse(cursor: Cursor):
         return parse_call_expr(cursor)
     elif cursor.kind == CursorKind.STRING_LITERAL:
         return parse_string_literal(cursor)
+    elif cursor.kind == CursorKind.UNARY_OPERATOR:
+        return parse_unary_op(cursor)
     return None
 
 
