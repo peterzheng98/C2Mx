@@ -25,12 +25,12 @@ class FuncDecl(AbstractASTNode):
         return '<Function: {}, return: {}>'.format(self.spelling, self.returnType)
 
     def generateMx(self):
-        st = '{} {}({});'.format(
-                self.returnType.nodeType.name.lower(), self.spelling,
+        st = '{} {}({})'.format(
+                repr(self.returnType.nodeType), self.spelling,
                 ','.join([i.generateMx() for i in self.params])
             )
         if self.statement is None:
-            return st
+            return st + ';'
         st = st + self.statement.generateMx()
         return st
 
@@ -46,4 +46,4 @@ class ParmDecl(AbstractASTNode):
         self.nodeType = nodeType
 
     def generateMx(self):
-        return '{} {}'.format(self.returnType.nodeType.name.lower(), self.spelling)
+        return '{} {}'.format(repr(self.returnType.nodeType), self.spelling)

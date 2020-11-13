@@ -1,5 +1,5 @@
 from .AbstractASTNode import AbstractASTNode
-from .AbstractType import AbstractType, ValidType
+from .AbstractType import AbstractType, ValidType, ArrayType
 
 
 class VarDecl(AbstractASTNode):
@@ -13,4 +13,9 @@ class VarDecl(AbstractASTNode):
         self.nodeType = nodeType
 
     def generateMx(self) -> str:
-        return ''
+        if isinstance(self.declType.nodeType, ArrayType):
+            return '\t{} {} = new {};'.format(
+                self.declType.nodeType.generateNoLength(), self.spelling, self.declType.nodeType.generateWithLength()
+            )
+        else:
+            return '\t{} {};'.format(repr(self.declType.nodeType), self.spelling)

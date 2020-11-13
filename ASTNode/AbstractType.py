@@ -82,3 +82,12 @@ class ArrayType(AbstractType):
 
     def __repr__(self):
         return repr(self.baseType) + repr(self.length)
+
+    def generateNoLength(self):
+        return repr(self.baseType) + '[]' * len(self.length)
+
+    def generateWithLength(self):
+        st = ''
+        for i in self.length:
+            st = st + '[{}]'.format(i)
+        return repr(self.baseType) + st

@@ -12,8 +12,9 @@ class CompoundStmt(AbstractASTNode):
     def addChildren(self, childNode):
         self.children.append(childNode)
 
+    # TODO: remove stub
     def generateMx(self) -> str:
-        return '{\n' + '\n'.join([i.generateMx() for i in self.children]) + '\n}'
+        return '{\n' + '\n'.join([i.generateMx() if i is not None else '-'  for i in self.children]) + '\n}'
 
 
 class ReturnStmt(AbstractASTNode):
