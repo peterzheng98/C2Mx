@@ -102,6 +102,9 @@ def parse_call_expr(cursor: Cursor):
 
 def parse_unary_op(cursor: Cursor):
     assert cursor.kind == CursorKind.UNARY_OPERATOR, "Node type is {}, not UNARY_OPERATOR".format(cursor.kind)
+    # parsing by token
+    l = [i for i in cursor.get_tokens()]
+    return
 
 
 
