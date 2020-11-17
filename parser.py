@@ -135,9 +135,39 @@ def parse_decl_ref_expr(cursor: Cursor):
 def parse_for_stmt(cursor: Cursor):
     assert cursor.kind == CursorKind.FOR_STMT, "Node type is {}, not FOR_STMT".format(cursor.kind)
     children_list = [i for i in cursor.get_children()]
+    NoneNode1 = NoneStmt()
+    NoneNode2 = NoneStmt()
+    NoneNode3 = NoneStmt()
+    token_lists = [i.spelling for i in cursor.get_tokens()]
+    left_paren_idx = token_lists.index('(')
+    semi_idx = [i for i, x in enumerate(token_lists) if x == ';']
+    new_children_list = []
+    # 这里主要考虑的是condition中也可以有括号，所以index方法取右括号是有可能取不到最后一个右括号
+    # 观察for的语法可以发现第一个左大括号左边必然是右括号（不包括注释）
+    left_big_paren_idx = token_lists.index('{')
+    right_paren_idx = left_big_paren_idx - 1
+    # check whether initial exists
+    cnt = 0
+    if semi_idx[0] == left_paren_idx + 1:
+        new_children_list.append(NoneNode1)
+    else:
+        new_children_list.append(children_list[cnt])
+        cnt = cnt + 1
+
+    if semi_idx[1] == semi_idx[0] + 1:
+        new_children_list.append(NoneNode2)
+    else:
+        new_children_list.append(children_list[cnt])
+        cnt = cnt + 1
+
+    if right_paren_idx == semi_idx[1] + 1:
+        new_children_list.append(NoneNode3)
+    else:
+        new_children_list.append(children_list[cnt])
+    new_children_list.append(children_list[-1])
     return ForStmt(
         (cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind,
-        parse(children_list[0]), parse(children_list[1]), parse(children_list[2]), parse(children_list[3])
+        parse(new_children_list[0]), parse(new_children_list[1]), parse(new_children_list[2]), parse(new_children_list[3])
     )
 
 
@@ -154,7 +184,9 @@ def parse_binary_op(cursor: Cursor):
 
 
 def parse(cursor: Cursor):
-    if cursor.kind == CursorKind.TRANSLATION_UNIT:
+    if isinstance(cursor, NoneStmt):
+        return cursor
+    elif cursor.kind == CursorKind.TRANSLATION_UNIT:
         return parse_translation_unit(cursor)
     elif cursor.kind == CursorKind.PARM_DECL:
         return parse_parm_decl(cursor)

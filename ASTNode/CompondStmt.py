@@ -65,3 +65,12 @@ class ForStmt(AbstractASTNode):
         return 'for({};{};{})'.format(
             self.forInitial.generateMx(), self.forCond.generateMx(), self.forTermination.generateMx()
         ) + self.forStmt.generateMx()
+
+
+class NoneStmt(AbstractASTNode):
+    def __init__(self):
+        self.originalPosition = None
+        self.nodeType = None
+
+    def generateMx(self) -> str:
+        return ''

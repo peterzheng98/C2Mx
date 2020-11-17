@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 int main() {
-	int t,a[50],b[50],n,x;
+	int t,a[50],b[50],n,x,j;
 	scanf("%d",&a[n]);
 	for(int i=0;i<t;i++){
 		scanf("%d %d",&n,&x);
