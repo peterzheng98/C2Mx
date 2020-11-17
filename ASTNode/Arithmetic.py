@@ -14,7 +14,7 @@ class UnaryOp(AbstractASTNode):
 
 
 class BinaryOp(AbstractASTNode):
-    search_list = ['+', '-', '*', '/', '<', '>', '==', '<=', '>=', '!=']
+    search_list = ['+', '-', '*', '/', '<', '>', '==', '<=', '>=', '!=', '=']
     internal_idx = -1
 
     def __init__(self, op):

@@ -205,6 +205,13 @@ def parse_paren_expr(cursor: Cursor):
     )
 
 
+def parse_int(cursor: Cursor):
+    assert cursor.kind == CursorKind.INTEGER_LITERAL
+    return IntegerLiteral(
+        (cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind, [i for i in cursor.get_tokens()][0]
+    )
+
+
 
 def parse(cursor: Cursor):
     if isinstance(cursor, NoneStmt):
@@ -243,7 +250,9 @@ def parse(cursor: Cursor):
         return parse_if_stmt(cursor)
     elif cursor.kind == CursorKind.PAREN_EXPR:
         return parse_paren_expr(cursor)
-    
+    elif cursor.kind == CursorKind.INTEGER_LITERAL:
+        return parse_int(cursor)
+    return None
     raise NotImplementedError()
 
 
