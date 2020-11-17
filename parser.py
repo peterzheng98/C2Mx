@@ -103,8 +103,14 @@ def parse_call_expr(cursor: Cursor):
 def parse_unary_op(cursor: Cursor):
     assert cursor.kind == CursorKind.UNARY_OPERATOR, "Node type is {}, not UNARY_OPERATOR".format(cursor.kind)
     # parsing by token
-    l = [i for i in cursor.get_tokens()]
-    return
+    l = [i.spelling for i in cursor.get_tokens()]
+    operation = l[0] if l[0] in UnaryOp('-').search_list else l[-1]
+    children_list = [i for i in cursor.get_children()]
+    assert len(children_list) == 1, 'Children list for unary expr should be 1-element.'
+    return UnaryExpr(
+        (cursor.extent.start.offset, cursor.extent.end.offset),
+        cursor.kind, operation, parse(children_list[0])
+    )
 
 
 

@@ -5,3 +5,4 @@ from .AbstractType import *
 from .VarDecl import *
 from .CallExpr import *
 from .Literals import *
+from .Arithmetic import *
