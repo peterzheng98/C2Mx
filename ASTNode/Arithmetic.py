@@ -25,3 +25,17 @@ class UnaryExpr(AbstractASTNode):
 
     def generateMx(self) -> str:
         return self.op.generateMx() + self.target.generateMx()
+
+
+class ArraySubscribeExpr(AbstractASTNode):
+    base = None
+    idx = None
+
+    def __init__(self, position, nodeType, base, idx):
+        self.originalPosition = position
+        self.nodeType = nodeType
+        self.base = base
+        self.idx = idx
+
+    def generateMx(self) -> str:
+        return self.base.generateMx() + '[{}]'.format(self.idx.generateMx())

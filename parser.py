@@ -113,6 +113,25 @@ def parse_unary_op(cursor: Cursor):
     )
 
 
+def parse_array_sub_expr(cursor: Cursor):
+    assert cursor.kind == CursorKind.ARRAY_SUBSCRIPT_EXPR, "Node type is {}, not ARRAY_SUBSCRIPT_EXPR".format(cursor.kind)
+    children_list = [i for i in cursor.get_children()]
+    assert len(children_list) == 2, 'Children list for array subscribe expr should be 2-elements.'
+    return ArraySubscribeExpr(
+        (cursor.extent.start.offset, cursor.extent.end.offset),
+        cursor.kind, parse(children_list[0]), parse(children_list[1])
+    )
+
+
+# Todo: fix here: decl reference expression should check the type and set independent node type
+def parse_decl_ref_expr(cursor: Cursor):
+    assert cursor.kind == CursorKind.DECL_REF_EXPR, "Node type is {}, not DECL_REF_EXPR".format(cursor.kind)
+    children_list = [i for i in cursor.get_children()]
+    return StringLiteral(
+        (cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind, cursor.displayname
+    )
+
+
 
 def parse(cursor: Cursor):
     if cursor.kind == CursorKind.TRANSLATION_UNIT:
@@ -137,7 +156,11 @@ def parse(cursor: Cursor):
         return parse_string_literal(cursor)
     elif cursor.kind == CursorKind.UNARY_OPERATOR:
         return parse_unary_op(cursor)
-    return None
+    elif cursor.kind == CursorKind.ARRAY_SUBSCRIPT_EXPR:
+        return parse_array_sub_expr(cursor)
+    elif cursor.kind == CursorKind.DECL_REF_EXPR:
+        return parse_decl_ref_expr(cursor)
+    raise NotImplementedError()
 
 
 # if platform.system() == 'Linux':
