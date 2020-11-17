@@ -14,7 +14,7 @@ class CompoundStmt(AbstractASTNode):
 
     # TODO: remove stub
     def generateMx(self) -> str:
-        return '{\n' + '\n'.join([i.generateMx() if i is not None else '-'  for i in self.children]) + '\n}'
+        return '{\n' + '\n'.join([i.generateMx() + ';' if i is not None else '-'  for i in self.children]) + '\n}'
 
 
 class ReturnStmt(AbstractASTNode):
@@ -44,7 +44,7 @@ class DeclStmt(AbstractASTNode):
         self.children.append(childNode)
 
     def generateMx(self) -> str:
-        return '\n'.join([i.generateMx() for i in self.children])
+        return '\n'.join([i.generateMx() + ';' for i in self.children])
 
 
 class ForStmt(AbstractASTNode):
@@ -56,7 +56,7 @@ class ForStmt(AbstractASTNode):
     def __init__(self, position, nodeType, initial, cond, term, stmt):
         self.originalPosition = position
         self.nodeType = nodeType
-        self.forInitial = initial
+        self.forInitial = initial if not isinstance(initial, DeclStmt) else initial.children[0]
         self.forCond = cond
         self.forTermination = term
         self.forStmt = stmt
@@ -85,11 +85,39 @@ class IfStmt(AbstractASTNode):
         self.originalPosition = position
         self.nodeType = nodeType
         self.ifCond = cond
-        self.ifThen = thenStmt
-        self.ifElse = elseStmt
+        if not isinstance(thenStmt, CompoundStmt):
+            stmt = CompoundStmt(position, nodeType, [])
+            stmt.addChildren(thenStmt)
+            self.ifThen = stmt
+        else:
+            self.ifThen = thenStmt
+        if not isinstance(thenStmt, CompoundStmt) and not isinstance(elseStmt, NoneStmt):
+            stmt2 = CompoundStmt(position, nodeType, [])
+            stmt2.addChildren(elseStmt)
+            self.ifElse = stmt2
+        else:
+            self.ifElse = elseStmt
 
     def generateMx(self) -> str:
         retStr = 'if({})'.format(self.ifCond.generateMx()) + self.ifThen.generateMx()
         if not isinstance(self.ifElse, NoneStmt):
-            retStr += 'else' + self.ifElse.generateMx()
+            retStr += ' else ' + self.ifElse.generateMx()
         return retStr
+
+
+class ContinueStmt(AbstractASTNode):
+    def __init__(self, position, nodeType):
+        self.originalPosition = position
+        self.nodeType = nodeType
+
+    def generateMx(self) -> str:
+        return 'continue'
+
+
+class BreakStmt(AbstractASTNode):
+    def __init__(self, position, nodeType):
+        self.originalPosition = position
+        self.nodeType = nodeType
+
+    def generateMx(self) -> str:
+        return 'break'

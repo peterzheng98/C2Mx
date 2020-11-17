@@ -19,9 +19,13 @@ from ASTNode.AbstractType import _type_kind_to_validType
 
 
 def parse_var_decl(cursor: Cursor):
+    s = None
+    children_list = [i for i in cursor.get_children()]
+    if len(children_list) != 0:
+        s = parse(children_list[0])
     return VarDecl(
         (cursor.extent.start.offset, cursor.extent.end.offset),
-        cursor.kind, cursor.spelling, _type_kind_to_validType(cursor.type.kind, cursor.type)
+        cursor.kind, cursor.spelling, _type_kind_to_validType(cursor.type.kind, cursor.type), s
     )
 
 
@@ -208,9 +212,22 @@ def parse_paren_expr(cursor: Cursor):
 def parse_int(cursor: Cursor):
     assert cursor.kind == CursorKind.INTEGER_LITERAL
     return IntegerLiteral(
-        (cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind, [i for i in cursor.get_tokens()][0]
+        (cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind, [i.spelling for i in cursor.get_tokens()][0]
     )
 
+
+def parse_continue_stmt(cursor: Cursor):
+    assert cursor.kind == CursorKind.CONTINUE_STMT
+    return ContinueStmt(
+        (cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind
+    )
+
+
+def parse_break_stmt(cursor: Cursor):
+    assert cursor.kind == CursorKind.BREAK_STMT
+    return BreakStmt(
+        (cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind
+    )
 
 
 def parse(cursor: Cursor):
@@ -252,7 +269,10 @@ def parse(cursor: Cursor):
         return parse_paren_expr(cursor)
     elif cursor.kind == CursorKind.INTEGER_LITERAL:
         return parse_int(cursor)
-    return None
+    elif cursor.kind == CursorKind.CONTINUE_STMT:
+        return parse_continue_stmt(cursor)
+    elif cursor.kind == CursorKind.BREAK_STMT:
+        return parse_break_stmt(cursor)
     raise NotImplementedError()
 
 
