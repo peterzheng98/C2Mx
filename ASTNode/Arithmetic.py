@@ -13,6 +13,17 @@ class UnaryOp(AbstractASTNode):
         return self.search_list[self.internal_idx]
 
 
+class BinaryOp(AbstractASTNode):
+    search_list = ['+', '-', '*', '/', '<', '>', '==', '<=', '>=', '!=']
+    internal_idx = -1
+
+    def __init__(self, op):
+        self.internal_idx = self.search_list.index(op)
+
+    def generateMx(self) -> str:
+        return self.search_list[self.internal_idx]
+
+
 class UnaryExpr(AbstractASTNode):
     op = None
     target = None
@@ -39,3 +50,19 @@ class ArraySubscribeExpr(AbstractASTNode):
 
     def generateMx(self) -> str:
         return self.base.generateMx() + '[{}]'.format(self.idx.generateMx())
+
+
+class BinaryExpr(AbstractASTNode):
+    leftExpr = None
+    rightExpr = None
+    op = None
+
+    def __init__(self, position, nodeType, op, left, right):
+        self.originalPosition = position
+        self.op = BinaryOp(op)
+        self.nodeType = nodeType
+        self.leftExpr = left
+        self.rightExpr = right
+
+    def generateMx(self) -> str:
+        return self.leftExpr.generateMx() + self.op.generateMx() + self.rightExpr.generateMx()

@@ -17,4 +17,4 @@ class CallExpr(AbstractASTNode):
 
     # TODO: remove stub
     def generateMx(self) -> str:
-        return self.funcName + '(' + ','.join([i.generateMx() if i is not None else '-' for i in self.args]) + ')'
+        return self.funcName + '(' + ','.join([i.generateMx() if i is not None else '-' for i in self.args]) + ');'

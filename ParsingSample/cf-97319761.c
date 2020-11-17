@@ -1,10 +1,10 @@
 #include <stdio.h>
 
 int main() {
-	int t,a[50][21],b[50],n,x;
-	scanf("%d",&a[n][t]);
-//	for(int i=0;i<t;i++){
-//		scanf("%d %d",&n,&x);
+	int t,a[50],b[50],n,x;
+	scanf("%d",&a[n]);
+	for(int i=0;i<t;i++){
+		scanf("%d %d",&n,&x);
 //		for(int j=0;j<n;j++){
 //			scanf("%d",&a[j]);
 //		}
@@ -24,5 +24,5 @@ int main() {
 //		printf("NO\n");
 //		else
 //		printf("YES\n");
-//	}
+	}
 }

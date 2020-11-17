@@ -132,6 +132,26 @@ def parse_decl_ref_expr(cursor: Cursor):
     )
 
 
+def parse_for_stmt(cursor: Cursor):
+    assert cursor.kind == CursorKind.FOR_STMT, "Node type is {}, not FOR_STMT".format(cursor.kind)
+    children_list = [i for i in cursor.get_children()]
+    return ForStmt(
+        (cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind,
+        parse(children_list[0]), parse(children_list[1]), parse(children_list[2]), parse(children_list[3])
+    )
+
+
+def parse_binary_op(cursor: Cursor):
+    assert cursor.kind == CursorKind.BINARY_OPERATOR
+    children_list = [i for i in cursor.get_children()]
+    assert len(children_list) == 2, 'Children list for binary operation should be 2-elements.'
+    left_offset = len([i for i in children_list[0].get_tokens()])
+    op = [i for i in cursor.get_tokens()][left_offset].spelling
+    return BinaryExpr(
+        (cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind,
+        op, parse(children_list[0]), parse(children_list[1])
+    )
+
 
 def parse(cursor: Cursor):
     if cursor.kind == CursorKind.TRANSLATION_UNIT:
@@ -160,6 +180,10 @@ def parse(cursor: Cursor):
         return parse_array_sub_expr(cursor)
     elif cursor.kind == CursorKind.DECL_REF_EXPR:
         return parse_decl_ref_expr(cursor)
+    elif cursor.kind == CursorKind.FOR_STMT:
+        return parse_for_stmt(cursor)
+    elif cursor.kind == CursorKind.BINARY_OPERATOR:
+        return parse_binary_op(cursor)
     raise NotImplementedError()
 
 
