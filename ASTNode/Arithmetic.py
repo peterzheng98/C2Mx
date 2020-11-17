@@ -66,3 +66,15 @@ class BinaryExpr(AbstractASTNode):
 
     def generateMx(self) -> str:
         return self.leftExpr.generateMx() + self.op.generateMx() + self.rightExpr.generateMx()
+
+
+class ParenExpr(AbstractASTNode):
+    core = None
+
+    def __init__(self, position, nodeType, core):
+        self.originalPosition = position
+        self.nodeType = nodeType
+        self.core = core
+
+    def generateMx(self) -> str:
+        return '(' + self.core.generateMx() + ')'

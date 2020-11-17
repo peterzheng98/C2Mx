@@ -74,3 +74,22 @@ class NoneStmt(AbstractASTNode):
 
     def generateMx(self) -> str:
         return ''
+
+
+class IfStmt(AbstractASTNode):
+    ifCond = None
+    ifThen = None
+    ifElse = None
+
+    def __init__(self, position, nodeType, cond, thenStmt, elseStmt=NoneStmt()):
+        self.originalPosition = position
+        self.nodeType = nodeType
+        self.ifCond = cond
+        self.ifThen = thenStmt
+        self.ifElse = elseStmt
+
+    def generateMx(self) -> str:
+        retStr = 'if({})'.format(self.ifCond.generateMx()) + self.ifThen.generateMx()
+        if not isinstance(self.ifElse, NoneStmt):
+            retStr += 'else' + self.ifElse.generateMx()
+        return retStr

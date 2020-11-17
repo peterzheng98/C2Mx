@@ -172,7 +172,7 @@ def parse_for_stmt(cursor: Cursor):
 
 
 def parse_binary_op(cursor: Cursor):
-    assert cursor.kind == CursorKind.BINARY_OPERATOR
+    assert cursor.kind == CursorKind.BINARY_OPERATOR, "Node type is {}, not BINARY_OPERATOR".format(cursor.kind)
     children_list = [i for i in cursor.get_children()]
     assert len(children_list) == 2, 'Children list for binary operation should be 2-elements.'
     left_offset = len([i for i in children_list[0].get_tokens()])
@@ -181,6 +181,29 @@ def parse_binary_op(cursor: Cursor):
         (cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind,
         op, parse(children_list[0]), parse(children_list[1])
     )
+
+
+def parse_if_stmt(cursor: Cursor):
+    assert cursor.kind == CursorKind.IF_STMT, "Node type is {}, not IF_STMT".format(cursor.kind)
+    children_list = [i for i in cursor.get_children()]
+    assert len(children_list) >= 2, 'Children list for if statements should be more than 2 elements.'
+    if len(children_list) == 2:
+        children_list.append(NoneStmt())
+    return IfStmt(
+        (cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind,
+        parse(children_list[0]), parse(children_list[1]), parse(children_list[2])
+    )
+
+
+def parse_paren_expr(cursor: Cursor):
+    assert cursor.kind == CursorKind.PAREN_EXPR, "Node type is {}, not PAREN_EXPR".format(cursor.kind)
+    children_list = [i for i in cursor.get_children()]
+    assert len(children_list) == 1, 'Children list for paren operation should be 1-elements.'
+    return ParenExpr(
+        (cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind,
+        parse(children_list[0])
+    )
+
 
 
 def parse(cursor: Cursor):
@@ -216,6 +239,11 @@ def parse(cursor: Cursor):
         return parse_for_stmt(cursor)
     elif cursor.kind == CursorKind.BINARY_OPERATOR:
         return parse_binary_op(cursor)
+    elif cursor.kind == CursorKind.IF_STMT:
+        return parse_if_stmt(cursor)
+    elif cursor.kind == CursorKind.PAREN_EXPR:
+        return parse_paren_expr(cursor)
+    
     raise NotImplementedError()
 
 
