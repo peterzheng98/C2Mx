@@ -98,10 +98,17 @@ def parse_string_literal(cursor: Cursor):
 
 def parse_call_expr(cursor: Cursor):
     assert cursor.kind == CursorKind.CALL_EXPR, "Node type is {}, not CALL_EXPR".format(cursor.kind)
-    return CallExpr(
+    baseExpr = CallExpr(
         (cursor.extent.start.offset, cursor.extent.end.offset),
         cursor.kind, cursor.spelling, [parse(i) for i in cursor.get_arguments()]
     )
+    if baseExpr.funcName == 'scanf':
+        # check the first parameter
+        assert isinstance(baseExpr.args[0], StringLiteral), "scanf function should receive the first parameter as string literals"
+        # check the parameter counts
+        loadCnt = len(baseExpr.args) - 1
+
+    return baseExpr
 
 
 def parse_unary_op(cursor: Cursor):
