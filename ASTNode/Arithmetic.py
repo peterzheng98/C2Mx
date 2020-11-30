@@ -1,8 +1,8 @@
-from .AbstractASTNode import AbstractASTNode
+from .AbstractASTNode import AbstractASTNode, AbstractExprNode
 from .AbstractType import AbstractType, ValidType, ArrayType
 
 
-class UnaryOp(AbstractASTNode):
+class UnaryOp(AbstractASTNode, AbstractExprNode):
     search_list = ['~', '-', '--', '++', '&']
     internal_idx = -1
 
@@ -13,7 +13,7 @@ class UnaryOp(AbstractASTNode):
         return self.search_list[self.internal_idx]
 
 
-class BinaryOp(AbstractASTNode):
+class BinaryOp(AbstractASTNode, AbstractExprNode):
     search_list = ['+', '-', '*', '/', '<', '>', '==', '<=', '>=', '!=', '=']
     internal_idx = -1
 
@@ -24,7 +24,7 @@ class BinaryOp(AbstractASTNode):
         return self.search_list[self.internal_idx]
 
 
-class UnaryExpr(AbstractASTNode):
+class UnaryExpr(AbstractASTNode, AbstractExprNode):
     op = None
     target = None
 
@@ -38,7 +38,7 @@ class UnaryExpr(AbstractASTNode):
         return self.op.generateMx() + self.target.generateMx()
 
 
-class ArraySubscribeExpr(AbstractASTNode):
+class ArraySubscribeExpr(AbstractASTNode, AbstractExprNode):
     base = None
     idx = None
 
@@ -52,7 +52,7 @@ class ArraySubscribeExpr(AbstractASTNode):
         return self.base.generateMx() + '[{}]'.format(self.idx.generateMx())
 
 
-class BinaryExpr(AbstractASTNode):
+class BinaryExpr(AbstractASTNode, AbstractExprNode):
     leftExpr = None
     rightExpr = None
     op = None
@@ -68,7 +68,7 @@ class BinaryExpr(AbstractASTNode):
         return self.leftExpr.generateMx() + self.op.generateMx() + self.rightExpr.generateMx()
 
 
-class ParenExpr(AbstractASTNode):
+class ParenExpr(AbstractASTNode, AbstractExprNode):
     core = None
 
     def __init__(self, position, nodeType, core):

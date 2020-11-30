@@ -1,5 +1,7 @@
 from .AbstractASTNode import AbstractASTNode, AbstractExprNode, AbstractStmtNode
 
+TabSizeValue = 0
+
 
 class CompoundStmt(AbstractASTNode, AbstractStmtNode):
     children = []
@@ -14,7 +16,13 @@ class CompoundStmt(AbstractASTNode, AbstractStmtNode):
 
     # TODO: remove stub
     def generateMx(self) -> str:
-        return '{\n' + '\n'.join([i.generateMx() + (';' if isinstance(i, AbstractExprNode) else '') if i is not None else '-'  for i in self.children]) + '\n}'
+        global TabSizeValue
+        TabSizeValue = TabSizeValue + 1
+        split_str = '\n'
+        after_tab = '\n{}'.format('\t' * (TabSizeValue - 1))
+        res_str = '{\n' + split_str.join(['\t' * TabSizeValue + i.generateMx() + (';' if isinstance(i, AbstractExprNode) else '') if i is not None else '-'  for i in self.children]) + after_tab + '}'
+        TabSizeValue = TabSizeValue - 1
+        return res_str
 
 
 class ReturnStmt(AbstractASTNode, AbstractExprNode):
@@ -44,7 +52,10 @@ class DeclStmt(AbstractASTNode, AbstractStmtNode):
         self.children.append(childNode)
 
     def generateMx(self) -> str:
-        return '\n'.join([i.generateMx() + '[declstmt;]' for i in self.children])
+        global TabSizeValue
+        baseTab = '\n{}'.format('\t' * TabSizeValue)
+        retStr = baseTab.join([i.generateMx() + ';' for i in self.children])
+        return retStr
 
 
 class ForStmt(AbstractASTNode, AbstractStmtNode):
@@ -62,9 +73,13 @@ class ForStmt(AbstractASTNode, AbstractStmtNode):
         self.forStmt = stmt
 
     def generateMx(self) -> str:
-        return 'for({};{};{})'.format(
-            self.forInitial.generateMx(), self.forCond.generateMx(), self.forTermination.generateMx()
-        ) + self.forStmt.generateMx()
+        global TabSizeValue
+        oldTabSizeValue = TabSizeValue
+        TabSizeValue = 0
+        baseStr = 'for({};{};{})'.format(self.forInitial.generateMx(), self.forCond.generateMx(), self.forTermination.generateMx())
+        TabSizeValue = oldTabSizeValue
+        baseStr += self.forStmt.generateMx()
+        return baseStr
 
 
 class NoneStmt(AbstractASTNode, AbstractStmtNode):
