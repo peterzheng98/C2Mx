@@ -42,8 +42,8 @@ def _type_kind_to_validType(tk, spelling=''):
         return ValidType(2)
     if tk == TypeKind.VOID:
         return ValidType(3)
-    # if tk == 'string':
-    #     return ValidType(4)
+    if isinstance(spelling, clang.cindex.Type) and spelling.spelling == 'char *':
+        return ValidType(4)
     # No string currently found
     debug('Type not valid, received {}'.format(tk))
     return ValidType(5)

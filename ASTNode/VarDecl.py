@@ -7,7 +7,7 @@ class VarDecl(AbstractASTNode):
     declType = AbstractType(nodeType=None)
     initialValue = None
 
-    def __init__(self, position, nodeType, spelling, returnType: ValidType, initialValue = None):
+    def __init__(self, position, nodeType, spelling, returnType: ValidType, initialValue=None):
         self.originalPosition = position
         self.spelling = spelling
         self.declType = AbstractType(returnType)

@@ -15,6 +15,5 @@ class CallExpr(AbstractASTNode, AbstractExprNode):
     def addArgs(self, argNode):
         self.args.append(argNode)
 
-    # TODO: remove stub
     def generateMx(self) -> str:
-        return self.funcName + '(' + ','.join([i.generateMx() if i is not None else '-' for i in self.args]) + ')'
+        return self.funcName + '(' + ','.join([i.generateMx() for i in self.args]) + ')'

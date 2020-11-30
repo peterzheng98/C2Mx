@@ -16,7 +16,7 @@ from clang.cindex import CursorKind, TypeKind
 from clang.cindex import Cursor
 from ASTNode import *
 from ASTNode.AbstractType import _type_kind_to_validType
-
+from utils import *
 
 def parse_var_decl(cursor: Cursor):
     s = None
@@ -104,9 +104,39 @@ def parse_call_expr(cursor: Cursor):
     )
     if baseExpr.funcName == 'scanf':
         # check the first parameter
-        assert isinstance(baseExpr.args[0], StringLiteral), "scanf function should receive the first parameter as string literals"
+        assert isinstance(baseExpr.args[0], StringLiteral), \
+            "scanf function should receive the first parameter as string literals"
         # check the parameter counts
         loadCnt = len(baseExpr.args) - 1
+        placeholderCnt = str(baseExpr.args[0].value).count('%')
+        assert placeholderCnt == loadCnt, "Placeholder[{}] not fit the parameters[{}]! ".format(loadCnt, placeholderCnt)
+        callingExprStr = str(baseExpr.args[0].value)
+        nodeList = []
+        argsList = baseExpr.args[1:]
+        while callingExprStr.count('%') > 0:
+            frontStr = callingExprStr[0:callingExprStr.index('%')]
+            if len(frontStr) != 0:
+                debug('Currently, the matching input cannot be converted. Receive: [{}]'.format(frontStr))
+            placeholderTypeChar = callingExprStr[callingExprStr.index('%') + 1]
+            assert placeholderTypeChar == 's' or placeholderTypeChar == 'd', \
+                "Type cannot be converted. (Int, string) are valid, receive: {}".format(placeholderTypeChar)
+            headArg = argsList[0]
+            if isinstance(headArg, UnaryExpr):
+                headArg = headArg.target
+            argsList = argsList[1:]
+            if placeholderTypeChar == 'd':
+                newFuncName = 'getInt'
+            elif placeholderTypeChar == 's':
+                newFuncName = 'getString'
+            else:
+                raise RuntimeError()
+            binaryExpr = BinaryExpr((-1, -1), cursor.kind, '=', headArg, CallExpr((-1, -1), cursor.type, newFuncName, []))
+            nodeList.append(binaryExpr)
+            callingExprStr = callingExprStr[callingExprStr.index('%') + 2:]
+        if len(nodeList) == 1:
+            baseExpr = nodeList[0]
+        else:
+            baseExpr = CompoundStmt((cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind, nodeList)
 
     return baseExpr
 
@@ -292,5 +322,5 @@ if __name__ == '__main__':
     tu = index.parse('./ParsingSample/cf-97319761.c')
     ast = parse(tu.cursor)
     for i in ast:
-        print(i.generateMx()) if i is not None else None
+        print(i.generateMx())
     print(ast)

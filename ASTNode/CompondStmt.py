@@ -14,13 +14,12 @@ class CompoundStmt(AbstractASTNode, AbstractStmtNode):
     def addChildren(self, childNode):
         self.children.append(childNode)
 
-    # TODO: remove stub
     def generateMx(self) -> str:
         global TabSizeValue
         TabSizeValue = TabSizeValue + 1
         split_str = '\n'
         after_tab = '\n{}'.format('\t' * (TabSizeValue - 1))
-        res_str = '{\n' + split_str.join(['\t' * TabSizeValue + i.generateMx() + (';' if isinstance(i, AbstractExprNode) else '') if i is not None else '-'  for i in self.children]) + after_tab + '}'
+        res_str = '{\n' + split_str.join(['\t' * TabSizeValue + i.generateMx() + (';' if isinstance(i, AbstractExprNode) else '') for i in self.children]) + after_tab + '}'
         TabSizeValue = TabSizeValue - 1
         return res_str
 
