@@ -1,8 +1,8 @@
-from .AbstractASTNode import AbstractASTNode
+from .AbstractASTNode import AbstractASTNode, AbstractExprNode
 from .AbstractType import AbstractType, ValidType, ArrayType
 
 
-class CallExpr(AbstractASTNode):
+class CallExpr(AbstractASTNode, AbstractExprNode):
     funcName = ''
     args = []
 

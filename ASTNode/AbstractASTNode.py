@@ -9,3 +9,11 @@ class AbstractASTNode:
     @abstractmethod
     def generateMx(self) -> str:
         raise NotImplementedError()
+
+
+class AbstractExprNode:
+    pass
+
+
+class AbstractStmtNode:
+    pass

@@ -30,7 +30,7 @@ class FuncDecl(AbstractASTNode):
                 ','.join([i.generateMx() for i in self.params])
             )
         if self.statement is None:
-            return st + ';'
+            return st + '[func-decl;]'
         st = st + self.statement.generateMx()
         return st
 

@@ -1,7 +1,7 @@
-from .AbstractASTNode import AbstractASTNode
+from .AbstractASTNode import AbstractASTNode, AbstractExprNode, AbstractStmtNode
 
 
-class CompoundStmt(AbstractASTNode):
+class CompoundStmt(AbstractASTNode, AbstractStmtNode):
     children = []
 
     def __init__(self, position, nodeType, children):
@@ -14,10 +14,10 @@ class CompoundStmt(AbstractASTNode):
 
     # TODO: remove stub
     def generateMx(self) -> str:
-        return '{\n' + '\n'.join([i.generateMx() + ';' if i is not None else '-'  for i in self.children]) + '\n}'
+        return '{\n' + '\n'.join([i.generateMx() + (';' if isinstance(i, AbstractExprNode) else '') if i is not None else '-'  for i in self.children]) + '\n}'
 
 
-class ReturnStmt(AbstractASTNode):
+class ReturnStmt(AbstractASTNode, AbstractExprNode):
     children = []
 
     def __init__(self, position, nodeType, children):
@@ -29,10 +29,10 @@ class ReturnStmt(AbstractASTNode):
         self.children.append(childNode)
 
     def generateMx(self) -> str:
-        return 'return' + '\n'.join([i.generateMx() for i in self.children])
+        return 'return ' + '\n'.join([i.generateMx() for i in self.children])
 
 
-class DeclStmt(AbstractASTNode):
+class DeclStmt(AbstractASTNode, AbstractStmtNode):
     children = []
 
     def __init__(self, position, nodeType, children):
@@ -44,10 +44,10 @@ class DeclStmt(AbstractASTNode):
         self.children.append(childNode)
 
     def generateMx(self) -> str:
-        return '\n'.join([i.generateMx() + ';' for i in self.children])
+        return '\n'.join([i.generateMx() + '[declstmt;]' for i in self.children])
 
 
-class ForStmt(AbstractASTNode):
+class ForStmt(AbstractASTNode, AbstractStmtNode):
     forInitial = None
     forCond = None
     forTermination = None
@@ -67,7 +67,7 @@ class ForStmt(AbstractASTNode):
         ) + self.forStmt.generateMx()
 
 
-class NoneStmt(AbstractASTNode):
+class NoneStmt(AbstractASTNode, AbstractStmtNode):
     def __init__(self):
         self.originalPosition = None
         self.nodeType = None
@@ -76,7 +76,7 @@ class NoneStmt(AbstractASTNode):
         return ''
 
 
-class IfStmt(AbstractASTNode):
+class IfStmt(AbstractASTNode, AbstractStmtNode):
     ifCond = None
     ifThen = None
     ifElse = None
@@ -105,7 +105,7 @@ class IfStmt(AbstractASTNode):
         return retStr
 
 
-class ContinueStmt(AbstractASTNode):
+class ContinueStmt(AbstractASTNode, AbstractExprNode):
     def __init__(self, position, nodeType):
         self.originalPosition = position
         self.nodeType = nodeType
@@ -114,7 +114,7 @@ class ContinueStmt(AbstractASTNode):
         return 'continue'
 
 
-class BreakStmt(AbstractASTNode):
+class BreakStmt(AbstractASTNode, AbstractExprNode):
     def __init__(self, position, nodeType):
         self.originalPosition = position
         self.nodeType = nodeType
