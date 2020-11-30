@@ -137,7 +137,49 @@ def parse_call_expr(cursor: Cursor):
             baseExpr = nodeList[0]
         else:
             baseExpr = CompoundStmt((cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind, nodeList)
-
+    elif baseExpr.funcName == 'printf':
+        assert isinstance(baseExpr.args[0], StringLiteral), \
+            "printf function should receive the first parameter as string literals"
+        loadCnt = len(baseExpr.args) - 1
+        placeholderCnt = str(baseExpr.args[0].value).count('%')
+        assert placeholderCnt == loadCnt, "Placeholder[{}] not fit the parameters[{}]! ".format(loadCnt, placeholderCnt)
+        callingExprStr = str(baseExpr.args[0].value)
+        nodeList = []
+        argsList = baseExpr.args[1:]
+        while callingExprStr.count('%') > 0:
+            frontStr = callingExprStr[0:callingExprStr.index('%')]
+            if len(frontStr) != 0:
+                if frontStr[0] != '"':
+                    frontStr = '"' + frontStr
+                if frontStr[-1] != '"':
+                    frontStr += '"'
+                nodeList.append(CallExpr((-1, -1), cursor.type, "print", [StringLiteral((-1, -1), cursor.type, frontStr)]))
+            placeholderTypeChar = callingExprStr[callingExprStr.index('%') + 1]
+            assert placeholderTypeChar == 's' or placeholderTypeChar == 'd', \
+                "Type cannot be converted. (Int, string) are valid, receive: {}".format(placeholderTypeChar)
+            headArg = argsList[0]
+            if isinstance(headArg, UnaryExpr):
+                headArg = headArg.target
+            argsList = argsList[1:]
+            if placeholderTypeChar == 'd':
+                newFuncName = 'printInt'
+            elif placeholderTypeChar == 's':
+                newFuncName = 'print'
+            else:
+                raise RuntimeError()
+            nodeList.append(CallExpr((-1, -1), cursor.type, newFuncName, [headArg]))
+            callingExprStr = callingExprStr[callingExprStr.index('%') + 2:]
+            pass
+        if len(callingExprStr) != 0:
+            if callingExprStr[0] != '"':
+                callingExprStr = '"' + callingExprStr
+            if callingExprStr[-1] != '"':
+                callingExprStr += '"'
+            nodeList.append(CallExpr((-1, -1), cursor.type, "print", [StringLiteral((-1, -1), cursor.type, callingExprStr)]))
+        if len(nodeList) == 1:
+            baseExpr = nodeList[0]
+        else:
+            baseExpr = CompoundStmt((cursor.extent.start.offset, cursor.extent.end.offset), cursor.kind, nodeList)
     return baseExpr
 
 
@@ -185,7 +227,7 @@ def parse_for_stmt(cursor: Cursor):
     new_children_list = []
     # 这里主要考虑的是condition中也可以有括号，所以index方法取右括号是有可能取不到最后一个右括号
     # 观察for的语法可以发现第一个左大括号左边必然是右括号（不包括注释）
-    left_big_paren_idx = token_lists.index('{')
+    left_big_paren_idx = token_lists.index('{') if '{' in token_lists else len(token_lists) - len([i for i in children_list[-1].get_tokens()])
     right_paren_idx = left_big_paren_idx - 1
     # check whether initial exists
     cnt = 0
@@ -319,7 +361,7 @@ def parse(cursor: Cursor):
 #     Config.set_library_file('/Library/Developer/CommandLineTools/usr/lib/libclang.dylib')
 if __name__ == '__main__':
     index = clang.cindex.Index.create()
-    tu = index.parse('./ParsingSample/cf-97319761.c')
+    tu = index.parse('./ParsingSample/fft.c')
     ast = parse(tu.cursor)
     for i in ast:
         print(i.generateMx())

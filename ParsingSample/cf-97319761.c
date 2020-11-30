@@ -23,7 +23,7 @@ int main() {
 			}
 		}
 		if(flag==0)
-		printf("NO\n");
+		printf("NO%dafasfasafssaf%srrr\n", t, rs);
 		else
 		printf("YES\n");
 	}
